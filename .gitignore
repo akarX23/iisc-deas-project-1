@@ -7,3 +7,4 @@ data/
 test-deployments
 test-config.json
 docker-compose.yml
+artifacts/

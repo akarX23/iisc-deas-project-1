@@ -1,5 +1,4 @@
 from data_science.connectors import getNewSparkSession
-from pyspark.sql import SparkSession
 from sparkmeasure import StageMetrics
 from data_science.config import DATASET_PATH
 import time
@@ -8,7 +7,7 @@ import csv
 import json
 
 
-def run_data_cleaning(spark: SparkSession, df):
+def run_data_cleaning(df):
     """
     Execute the data cleaning pipeline.
     
@@ -73,15 +72,17 @@ def bench_pipeline(num_workers: int, mem_per_worker: int, cores_per_worker: int,
     results_csv_path = os.path.join(log_dir, "results.csv")
     csv_exists = os.path.exists(results_csv_path)
     
+    print("Creating Spark session...\n")
+
     spark = getNewSparkSession(num_workers=num_workers, mem_per_worker=mem_per_worker, cores_per_worker=cores_per_worker)
+
+    print("Loading dataset...\n")
     
     full_df = spark.read.csv(DATASET_PATH, header=True, inferSchema=True)
-    print(full_df.head())
     
     total_rows = full_df.count()
     num_rows = int(total_rows * dataset_scale)
-    
-    df = full_df.limit(num_rows) if dataset_scale < 1.0 else full_df
+    df = full_df.limit(num_rows)
     
     stagemetrics = StageMetrics(spark)
     stagemetrics_dir = os.path.join(log_dir, f"stagemetrics_{int(time.time())}")
@@ -89,7 +90,7 @@ def bench_pipeline(num_workers: int, mem_per_worker: int, cores_per_worker: int,
     start_e2e_time = time.time()
     stagemetrics.begin()
     
-    run_data_cleaning(spark=spark, df=df)
+    run_data_cleaning(df=df)
     
     stagemetrics.end()
     e2e_time = time.time() - start_e2e_time

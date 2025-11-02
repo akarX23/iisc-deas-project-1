@@ -1,6 +1,6 @@
 fastapi
 uvicorn[standard]
-pyspark
+pyspark==4.0.0
 gradio
 pandas
 python-multipart

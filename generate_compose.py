@@ -71,6 +71,9 @@ def generate_docker_compose(num_workers: int, mem_per_worker: int, cores_per_wor
                     "8080:8080",
                     "7077:7077"
                 ],
+                "volumes": [
+                    "./data:/app/data"
+                ],
                 "networks": ["spark-network"]
             },
             "fastapi": {
@@ -87,6 +90,7 @@ def generate_docker_compose(num_workers: int, mem_per_worker: int, cores_per_wor
                 "ports": ["8000:8000", "4040:4040"],
                 "volumes": [
                     "./:/app",
+                    "./data:/app/data",
                     "./logs:/app/logs"
                 ],
                 "depends_on": ["spark-master"],
@@ -119,6 +123,9 @@ def generate_docker_compose(num_workers: int, mem_per_worker: int, cores_per_wor
                 "SPARK_DAEMON_MEMORY": "1g"
             },
             "ports": [f"{8080 + i}:8081"],
+            "volumes": [
+                "./data:/app/data"
+            ],
             "depends_on": ["spark-master"],
             "networks": ["spark-network"]
         }

@@ -30,6 +30,7 @@ def getNewSparkSession(num_workers: int = 1, mem_per_worker: int = 10, cores_per
         master_url = f"spark://{SPARK_MASTER_HOST}:7077"
     
     builder = SparkSession.builder.appName("DEAS-Project-1").master(master_url)
+    cores_per_worker = max(1, cores_per_worker - 2)
     
     java_options = []
     if HTTP_PROXY_HOST and HTTP_PROXY_PORT:
@@ -43,10 +44,10 @@ def getNewSparkSession(num_workers: int = 1, mem_per_worker: int = 10, cores_per
 
     if not master_url.startswith("local"):
         builder = builder \
-            .config("spark.executor.instances", str(num_workers)) \
             .config("spark.executor.cores", str(cores_per_worker)) \
-            .config("spark.executor.memory", f"{mem_per_worker}g")
-            # .config("spark.cores.max", str(num_workers * cores_per_worker))
+            .config("spark.executor.memory", f"{mem_per_worker}g") \
+            .config("spark.executor.instances", str(num_workers)) \
+            .config("spark.cores.max", str(num_workers * cores_per_worker))
     else:
         builder = builder.config("spark.executor.memory", f"{mem_per_worker}g")
     
@@ -56,9 +57,9 @@ def getNewSparkSession(num_workers: int = 1, mem_per_worker: int = 10, cores_per
 
     if extra_java_options:
         builder = builder \
-            .config("spark.driver.extraJavaOptions", extra_java_options)
-            # .config("spark.executor.extraJavaOptions", extra_java_options)
+            .config("spark.driver.extraJavaOptions", extra_java_options) \
+            .config("spark.executor.extraJavaOptions", extra_java_options)
     
     spark = builder.getOrCreate()
-    print("\nNew Spark session created:", spark, "\n\n")
+    # print("\nNew Spark session created:", spark, "\n\n")
     return spark

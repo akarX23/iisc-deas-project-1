@@ -18,3 +18,5 @@ docker-compose*.yaml
 venv
 env
 test-deployments
+artifacts
+test-config.json
