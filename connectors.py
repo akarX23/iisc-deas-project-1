@@ -23,7 +23,7 @@ def getNewSparkSession(num_workers: int = 1, mem_per_worker: int = 10, cores_per
         spark.stop()
     print("Creating new Spark session...", spark)
     
-    executor_memory = int(mem_per_worker * 0.8)
+    executor_memory = int(mem_per_worker * 0.9)
     
     if SPARK_MASTER_HOST.startswith("local"):
         master_url = SPARK_MASTER_HOST
