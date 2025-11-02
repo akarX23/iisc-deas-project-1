@@ -1,7 +1,7 @@
-from connectors import getNewSparkSession
+from data_science.connectors import getNewSparkSession
 from pyspark.sql import SparkSession
 from sparkmeasure import StageMetrics
-from config import DATASET_PATH
+from data_science.config import DATASET_PATH
 import time
 import os
 import csv
@@ -76,6 +76,7 @@ def bench_pipeline(num_workers: int, mem_per_worker: int, cores_per_worker: int,
     spark = getNewSparkSession(num_workers=num_workers, mem_per_worker=mem_per_worker, cores_per_worker=cores_per_worker)
     
     full_df = spark.read.csv(DATASET_PATH, header=True, inferSchema=True)
+    print(full_df.head())
     
     total_rows = full_df.count()
     num_rows = int(total_rows * dataset_scale)

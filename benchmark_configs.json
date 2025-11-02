@@ -1,0 +1,136 @@
+[
+  {
+    "name": "BASE",
+    "num_workers": 1,
+    "mem_per_worker": 2,
+    "cores_per_worker": 4,
+    "dataset_scale": 1
+  },
+  {
+    "name": "SS-8",
+    "num_workers": 2,
+    "mem_per_worker": 4,
+    "cores_per_worker": 4,
+    "dataset_scale": 1
+  },
+  {
+    "name": "SS-16",
+    "num_workers": 4,
+    "mem_per_worker": 8,
+    "cores_per_worker": 4,
+    "dataset_scale": 1
+  },
+  {
+    "name": "SS-32",
+    "num_workers": 8,
+    "mem_per_worker": 8,
+    "cores_per_worker": 4,
+    "dataset_scale": 1
+  },
+  {
+    "name": "SS-64",
+    "num_workers": 16,
+    "mem_per_worker": 16,
+    "cores_per_worker": 4,
+    "dataset_scale": 1
+  },
+  {
+    "name": "SS-96",
+    "num_workers": 24,
+    "mem_per_worker": 24,
+    "cores_per_worker": 4,
+    "dataset_scale": 1
+  },
+  {
+    "name": "WS-8",
+    "num_workers": 2,
+    "mem_per_worker": 4,
+    "cores_per_worker": 4,
+    "dataset_scale": 0.1
+  },
+  {
+    "name": "WS-16",
+    "num_workers": 4,
+    "mem_per_worker": 8,
+    "cores_per_worker": 4,
+    "dataset_scale": 0.2
+  },
+  {
+    "name": "WS-32",
+    "num_workers": 8,
+    "mem_per_worker": 8,
+    "cores_per_worker": 4,
+    "dataset_scale": 0.4
+  },
+  {
+    "name": "WS-64",
+    "num_workers": 16,
+    "mem_per_worker": 16,
+    "cores_per_worker": 4,
+    "dataset_scale": 0.8
+  },
+  {
+    "name": "WS-96",
+    "num_workers": 24,
+    "mem_per_worker": 24,
+    "cores_per_worker": 4,
+    "dataset_scale": 1.0
+  },
+  {
+    "name": "W-1-96",
+    "num_workers": 1,
+    "mem_per_worker": 64,
+    "cores_per_worker": 96,
+    "dataset_scale": 0.5
+  },
+  {
+    "name": "W-2-48",
+    "num_workers": 2,
+    "mem_per_worker": 32,
+    "cores_per_worker": 48,
+    "dataset_scale": 0.5
+  },
+  {
+    "name": "W-4-24",
+    "num_workers": 4,
+    "mem_per_worker": 16,
+    "cores_per_worker": 24,
+    "dataset_scale": 0.5
+  },
+  {
+    "name": "W-6-16",
+    "num_workers": 6,
+    "mem_per_worker": 12,
+    "cores_per_worker": 16,
+    "dataset_scale": 0.5
+  },
+  {
+    "name": "W-8-12",
+    "num_workers": 8,
+    "mem_per_worker": 8,
+    "cores_per_worker": 12,
+    "dataset_scale": 0.5
+  },
+  {
+    "name": "W-12-8",
+    "num_workers": 12,
+    "mem_per_worker": 8,
+    "cores_per_worker": 8,
+    "dataset_scale": 0.5
+  },
+  {
+    "name": "W-16-6",
+    "num_workers": 16,
+    "mem_per_worker": 4,
+    "cores_per_worker": 6,
+    "dataset_scale": 0.5
+  },
+  {
+    "name": "W-24-4",
+    "num_workers": 24,
+    "mem_per_worker": 4,
+    "cores_per_worker": 4,
+    "dataset_scale": 0.5
+  }
+]
+
