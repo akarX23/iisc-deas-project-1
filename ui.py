@@ -1,107 +1,155 @@
 import gradio as gr
-import requests
 import pandas as pd
 import os
-from typing import List, Tuple
+from typing import Tuple
 import glob
 import time
+import json
+import subprocess
+import tempfile
 
 
-API_URL = "http://localhost:8000"
+CONFIG_FILE = "benchmark_configs.json"
+TEMP_CONFIG_FILE = "/tmp/ui_benchmark_config.json"
+
+# Basic configuration template
+DEFAULT_CONFIG = [
+    {
+        "name": "BASE",
+        "num_workers": 1,
+        "mem_per_worker": 120,
+        "cores_per_worker": 4,
+        "dataset_scale": 1.0,
+        "log_dir": "./logs/project-test",
+        "remark": "Baseline configuration with 1 worker"
+    }
+]
+
+def load_saved_configurations() -> str:
+    """Load configurations from the saved file."""
+    try:
+        if os.path.exists(CONFIG_FILE):
+            with open(CONFIG_FILE, 'r') as f:
+                configs = json.load(f)
+            return json.dumps(configs, indent=2)
+        else:
+            # Return default configuration if file doesn't exist
+            return json.dumps(DEFAULT_CONFIG, indent=2)
+    except Exception as e:
+        return json.dumps([{"error": f"Error loading configurations: {str(e)}"}], indent=2)
 
 
-def run_benchmark_ui(num_workers: int, mem_per_worker: int, cores_per_worker: int, dataset_scale: float, log_dir: str, progress=gr.Progress()) -> Tuple[str, str]:
+def validate_and_save_config(config_json: str) -> Tuple[str, str]:
     """
-    Run benchmark through the API and return results.
+    Validate the JSON configuration and save it.
     
     Args:
-        num_workers: Number of worker nodes
-        mem_per_worker: Memory per worker in GB
-        cores_per_worker: Number of cores per worker
-        dataset_scale: Dataset scale factor (0 to 1)
-        log_dir: Directory to save results
+        config_json: JSON string of configurations
+    
+    Returns:
+        Tuple of (status message, validated JSON)
+    """
+    try:
+        # Parse JSON to validate
+        configs = json.loads(config_json)
+        
+        # Validate it's a list
+        if not isinstance(configs, list):
+            return "❌ Configuration must be a JSON array (list)", config_json
+        
+        # Validate each configuration has required fields
+        required_fields = ["name", "num_workers", "mem_per_worker", "cores_per_worker", "dataset_scale", "log_dir"]
+        for i, config in enumerate(configs):
+            for field in required_fields:
+                if field not in config:
+                    return f"❌ Configuration {i} is missing required field: {field}", config_json
+        
+        # Save to temp file for running benchmarks
+        with open(TEMP_CONFIG_FILE, 'w') as f:
+            json.dump(configs, f, indent=2)
+        
+        return f"✅ Configuration validated! {len(configs)} configuration(s) ready to run.", json.dumps(configs, indent=2)
+    
+    except json.JSONDecodeError as e:
+        return f"❌ Invalid JSON: {str(e)}", config_json
+    except Exception as e:
+        return f"❌ Error: {str(e)}", config_json
+
+
+def run_benchmarks_script(config_json: str, progress=gr.Progress()) -> Tuple[str, str, str]:
+    """
+    Run the benchmarks script with the provided configuration.
+    
+    Args:
+        config_json: JSON string of configurations
         progress: Gradio progress tracker
     
     Returns:
-        Tuple of (status message, results dataframe as markdown)
+        Tuple of (status message, log output, results dataframe as markdown)
     """
-    start_time = time.time()
-    
     try:
-        # Show initial progress
-        progress(0, desc="🚀 Initializing benchmark...")
+        # Validate and save config to temp file
+        try:
+            configs = json.loads(config_json)
+            if not isinstance(configs, list):
+                return "❌ Configuration must be a JSON array", "", ""
+            
+            with open(TEMP_CONFIG_FILE, 'w') as f:
+                json.dump(configs, f, indent=2)
+        except json.JSONDecodeError as e:
+            return f"❌ Invalid JSON: {str(e)}", "", ""
         
-        # Prepare configuration message
-        config_msg = f"""
-⏳ **Benchmark Running...**
-
-**Configuration:**
-- Workers: {num_workers}
-- Memory per Worker: {mem_per_worker} GB
-- Cores per Worker: {cores_per_worker}
-- Dataset Scale: {dataset_scale}
-- Log Directory: {log_dir}
-
-**Status:** Sending request to API...
-"""
+        num_configs = len(configs)
         
-        progress(0.2, desc="📡 Sending request to API...")
-        time.sleep(0.5)  # Brief pause for visual feedback
+        if num_configs == 0:
+            return "❌ No configurations to run!", "", ""
         
-        # Make API request
-        progress(0.3, desc="⚙️ Spark session initializing...")
-        response = requests.post(
-            f"{API_URL}/benchmark",
-            json={
-                "num_workers": num_workers,
-                "mem_per_worker": mem_per_worker,
-                "cores_per_worker": cores_per_worker,
-                "dataset_scale": dataset_scale,
-                "log_dir": log_dir
-            },
-            timeout=300  # 5 minutes timeout
+        progress(0, desc=f"🚀 Starting benchmark script for {num_configs} configurations...")
+        
+        # Start the benchmark script in a subprocess
+        process = subprocess.Popen(
+            ['bash', 'run_benchmarks.sh', TEMP_CONFIG_FILE],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1
         )
         
-        progress(0.7, desc="📊 Processing benchmark results...")
+        log_output = []
         
-        if response.status_code == 200:
-            progress(0.9, desc="✅ Finalizing...")
+        progress(0.5, desc=f"⏳ Running {num_configs} benchmark configuration(s)... Please wait...")
+        
+        # Read output in real-time
+        for line in iter(process.stdout.readline, ''):
+            if line:
+                log_output.append(line.rstrip())
+        
+        process.wait()
+        
+        if process.returncode == 0:
+            progress(1.0, desc="✅ All benchmarks completed!")
             
-            data = response.json()
-            elapsed_time = time.time() - start_time
+            # Load and display results
+            results_md = load_all_results("./logs/*")
             
-            # Format the response
-            message = f"""
-✅ **Benchmark Completed Successfully!**
+            status = f"""
+✅ **All Benchmarks Completed Successfully!**
 
-**Configuration:**
-- Workers: {num_workers}
-- Memory per Worker: {mem_per_worker} GB
-- Cores per Worker: {cores_per_worker}
-- Dataset Scale: {dataset_scale}
+- Total Configurations: {num_configs}
+- Results saved in CSV files
 
-**Results:**
-- Rows Processed: {data['num_rows']:,}
-- Number of Stages: {data['num_stages']}
-- E2E Time: {data['E2E_time']:.2f} seconds
-- E2E Throughput: {data['E2E_throughput']:.2f} rows/sec
-- Total Runtime (including API overhead): {elapsed_time:.2f} seconds
-- Results File: {data['results_file']}
+Check the results below or in the "All Results" tab.
 """
-            
-            # Load and return the results CSV
-            progress(1.0, desc="✅ Complete!")
-            results_df = load_results_from_file(data['results_file'])
-            
-            return message, results_df
+            return status, "\n".join(log_output), results_md
         else:
-            error_msg = f"❌ **Benchmark Failed**\n\nStatus Code: {response.status_code}\n\n{response.text}"
-            return error_msg, ""
+            return (
+                f"❌ **Benchmark Script Failed**\n\nReturn code: {process.returncode}",
+                "\n".join(log_output),
+                ""
+            )
     
-    except requests.exceptions.Timeout:
-        return "❌ **Benchmark Failed**\n\nRequest timed out after 5 minutes.", ""
     except Exception as e:
-        return f"❌ **Benchmark Failed**\n\n{str(e)}", ""
+        return f"❌ **Error Running Benchmarks**\n\n{str(e)}", "", ""
 
 
 def load_results_from_file(file_path: str) -> str:
@@ -163,115 +211,52 @@ def load_all_results(log_dir_pattern: str = "./logs/*") -> str:
         return f"Error loading results: {str(e)}"
 
 
-def check_api_health() -> str:
-    """Check if the API is running."""
-    try:
-        response = requests.get(f"{API_URL}/health", timeout=5)
-        if response.status_code == 200:
-            return "✅ API is running and healthy"
-        else:
-            return f"⚠️ API responded with status code: {response.status_code}"
-    except requests.exceptions.ConnectionError:
-        return "❌ Cannot connect to API. Please ensure the FastAPI server is running on port 8000."
-    except Exception as e:
-        return f"❌ Error checking API health: {str(e)}"
-
-
-def update_status_running(num_workers, mem_per_worker, cores_per_worker, dataset_scale, log_dir):
-    """Update status to show benchmark is running."""
-    timestamp = time.strftime("%H:%M:%S")
-    return f"🔄 [{timestamp}] Benchmark RUNNING - Workers: {num_workers}, Memory: {mem_per_worker}GB, Cores: {cores_per_worker}, Scale: {dataset_scale}"
-
-
-def update_status_complete():
-    """Update status to show benchmark is complete."""
-    timestamp = time.strftime("%H:%M:%S")
-    return f"✅ [{timestamp}] Benchmark COMPLETED successfully!"
-
-
-def update_status_ready():
-    """Reset status to ready."""
-    return "Ready to run benchmark"
-
-
 # Create Gradio interface
 with gr.Blocks(title="Spark Pipeline Benchmark", theme=gr.themes.Soft()) as demo:
     gr.Markdown(
         """
         # 🚀 Spark Pipeline Benchmark Tool
         
-        Configure and run benchmarks for your Spark data processing pipeline.
-        Monitor performance metrics and compare different configurations.
+        Edit your benchmark configurations and execute them sequentially.
+        Docker containers will be automatically managed for each configuration.
         """
     )
     
-    # API Health Status
-    with gr.Row():
-        api_status = gr.Textbox(label="API Status", value=check_api_health(), interactive=False)
-        refresh_btn = gr.Button("🔄 Refresh Status", size="sm")
-    
-    refresh_btn.click(fn=check_api_health, outputs=api_status)
-    
     gr.Markdown("---")
     
-    # Benchmark Configuration
-    gr.Markdown("## ⚙️ Benchmark Configuration")
+    # Configuration Editor Section
+    gr.Markdown("## ⚙️ Benchmark Configurations")
+    gr.Markdown("Edit the JSON configuration below. Each object in the array represents one benchmark configuration.")
     
     with gr.Row():
         with gr.Column():
-            num_workers = gr.Slider(
-                minimum=1,
-                maximum=10,
-                value=2,
-                step=1,
-                label="Number of Workers",
-                info="Number of worker nodes in the Spark cluster"
+            configurations_json = gr.Code(
+                label="Configurations (JSON)",
+                language="json",
+                value=load_saved_configurations(),
+                lines=25,
+                interactive=True
             )
             
-            mem_per_worker = gr.Slider(
-                minimum=1,
-                maximum=32,
-                value=10,
-                step=1,
-                label="Memory per Worker (GB)",
-                info="Memory allocated to each worker"
-            )
+            with gr.Row():
+                validate_btn = gr.Button("✅ Validate Configuration", size="sm")
+                load_btn = gr.Button("� Reload from File", size="sm")
             
-            cores_per_worker = gr.Slider(
-                minimum=1,
-                maximum=16,
-                value=4,
-                step=1,
-                label="Cores per Worker",
-                info="Number of CPU cores per worker"
-            )
-        
-        with gr.Column():
-            dataset_scale = gr.Slider(
-                minimum=0.0,
-                maximum=1.0,
-                value=1.0,
-                step=0.1,
-                label="Dataset Scale",
-                info="Scale factor for dataset size (0 = 0%, 1 = 100%)"
-            )
-            
-            log_dir = gr.Textbox(
-                value="./logs/benchmark_1",
-                label="Log Directory",
-                info="Directory to save benchmark results"
-            )
+            config_status = gr.Textbox(label="Validation Status", interactive=False, lines=2)
     
-    # Run Benchmark Button
-    run_btn = gr.Button("▶️ Run Benchmark", variant="primary", size="lg")
+    # Run Benchmarks Section
+    gr.Markdown("---")
+    gr.Markdown("## ▶️ Execute Benchmarks")
+    gr.Markdown("Run all configured benchmarks sequentially. Docker containers will be created and destroyed for each configuration.")
     
-    # Status indicator
+    run_benchmarks_btn = gr.Button("🚀 Run All Benchmarks", variant="primary", size="lg")
+    
     with gr.Row():
         benchmark_status = gr.Textbox(
-            label="Benchmark Status",
-            value="Ready to run benchmark",
+            label="Execution Status",
+            value="Ready to run benchmarks",
             interactive=False,
-            lines=2
+            lines=3
         )
     
     # Results Section
@@ -279,32 +264,48 @@ with gr.Blocks(title="Spark Pipeline Benchmark", theme=gr.themes.Soft()) as demo
     gr.Markdown("## 📊 Benchmark Results")
     
     with gr.Tabs():
-        with gr.Tab("Current Run"):
-            status_output = gr.Markdown(label="Status")
-            results_output = gr.Markdown(label="Results")
+        with gr.Tab("Execution Log"):
+            gr.Markdown("Real-time output from the benchmark script")
+            log_output = gr.Textbox(
+                label="Script Output",
+                lines=25,
+                max_lines=50,
+                interactive=False,
+                show_copy_button=True
+            )
+        
+        with gr.Tab("Latest Results"):
+            latest_results = gr.Markdown(label="Results from Latest Run")
         
         with gr.Tab("All Results"):
-            gr.Markdown("View all benchmark results from all log directories")
+            gr.Markdown("View all benchmark results from log directories")
             log_pattern = gr.Textbox(
                 value="./logs/*",
                 label="Log Directory Pattern",
-                info="Glob pattern to search for results (e.g., ./logs/*)"
+                info="Glob pattern to search for results"
             )
             load_all_btn = gr.Button("📂 Load All Results", size="sm")
             all_results_output = gr.Markdown(label="All Results")
     
     # Connect the buttons
-    run_btn.click(
-        fn=update_status_running,
-        inputs=[num_workers, mem_per_worker, cores_per_worker, dataset_scale, log_dir],
+    validate_btn.click(
+        fn=validate_and_save_config,
+        inputs=[configurations_json],
+        outputs=[config_status, configurations_json]
+    )
+    
+    load_btn.click(
+        fn=load_saved_configurations,
+        outputs=[configurations_json]
+    )
+    
+    run_benchmarks_btn.click(
+        fn=lambda: "🔄 Running benchmarks...",
         outputs=[benchmark_status]
     ).then(
-        fn=run_benchmark_ui,
-        inputs=[num_workers, mem_per_worker, cores_per_worker, dataset_scale, log_dir],
-        outputs=[status_output, results_output]
-    ).then(
-        fn=update_status_complete,
-        outputs=[benchmark_status]
+        fn=run_benchmarks_script,
+        inputs=[configurations_json],
+        outputs=[benchmark_status, log_output, latest_results]
     )
     
     load_all_btn.click(
@@ -317,8 +318,30 @@ with gr.Blocks(title="Spark Pipeline Benchmark", theme=gr.themes.Soft()) as demo
     gr.Markdown(
         """
         ---
-        **Note:** Make sure the FastAPI server is running before running benchmarks.
-        Start the server with: `python main.py`
+        **Instructions:**
+        1. Edit the JSON configuration above (or load from file)
+        2. Click "Validate Configuration" to check if the JSON is valid
+        3. Click "Run All Benchmarks" to execute them sequentially
+        4. The script will automatically create and destroy Docker containers for each configuration
+        5. Monitor progress in the Execution Log tab
+        6. View results in the Latest Results or All Results tabs
+        
+        **Configuration Format:**
+        ```json
+        [
+          {
+            "name": "BASE",
+            "num_workers": 1,
+            "mem_per_worker": 120,
+            "cores_per_worker": 4,
+            "dataset_scale": 1.0,
+            "log_dir": "./logs/project-test",
+            "remark": "Description of this configuration"
+          }
+        ]
+        ```
+        
+        **Note:** Make sure Docker is running and you have the necessary permissions.
         """
     )
 
