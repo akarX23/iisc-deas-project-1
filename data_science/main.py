@@ -87,10 +87,9 @@ def bench_pipeline(num_workers: int, mem_per_worker: int, cores_per_worker: int,
     print("Loading dataset...\n")
     full_df = spark.read.csv(DATASET_PATH, header=True, inferSchema=True)
     
-    # Replicate the dataset 5 times
-    print("Replicating dataset 5 times...\n")
+    print("Replicating dataset 2 times...\n")
     replicated_df = full_df
-    for i in range(4):
+    for i in range(2):
         replicated_df = replicated_df.union(full_df)
     
     total_rows = replicated_df.count()
@@ -115,6 +114,9 @@ def bench_pipeline(num_workers: int, mem_per_worker: int, cores_per_worker: int,
     # Convert DataFrame to list of dictionaries
     stage_metrics_list = df_metrics.orderBy("jobId", "stageId").collect()
     
+    # Calculate total number of tasks across all stages
+    total_num_tasks = sum(stage_row.numTasks if hasattr(stage_row, 'numTasks') else 0 for stage_row in stage_metrics_list)
+    
     results = {
         "num_workers": num_workers,
         "mem_per_worker": mem_per_worker,
@@ -122,6 +124,7 @@ def bench_pipeline(num_workers: int, mem_per_worker: int, cores_per_worker: int,
         "dataset_scale": dataset_scale,
         "num_rows": num_rows,
         "num_stages": len(stage_metrics_list),
+        "num_tasks": total_num_tasks,
         "E2E_time": e2e_time,
         "E2E_throughput": num_rows / e2e_time if e2e_time > 0 else 0,
         "remark": remark
@@ -140,7 +143,7 @@ def bench_pipeline(num_workers: int, mem_per_worker: int, cores_per_worker: int,
         results[f"stage{i}_recordsRead"] = records_read
         results[f"stage{i}_bytesRead"] = stage_row.bytesRead if hasattr(stage_row, 'bytesRead') else 0
     
-    fieldnames = ["num_workers", "mem_per_worker", "cores_per_worker", "dataset_scale", "num_rows", "num_stages", "remark"]
+    fieldnames = ["num_workers", "mem_per_worker", "cores_per_worker", "dataset_scale", "num_rows", "num_stages", "num_tasks", "remark"]
     
     for i in range(len(stage_metrics_list)):
         fieldnames.extend([

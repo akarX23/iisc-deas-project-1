@@ -51,7 +51,7 @@ def generate_docker_compose(num_workers: int, mem_per_worker: int, cores_per_wor
         print(f"Error: Could not allocate cores for all workers. Requested: {num_workers}, Allocated: {len(core_allocations)}")
         sys.exit(1)
 
-    spark_worker_cores = max(1, cores_per_worker - 2)
+    spark_worker_cores = max(1, cores_per_worker - 1)
 
     compose_config = {
         "services": {
@@ -141,7 +141,7 @@ def generate_docker_compose(num_workers: int, mem_per_worker: int, cores_per_wor
                 "test": ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8081').raise_for_status()"],
                 "interval": "10s",
                 "timeout": "5s",
-                "retries": 15,
+                "retries": 100,
                 "start_period": "30s"
             },
             "networks": ["spark-network"]

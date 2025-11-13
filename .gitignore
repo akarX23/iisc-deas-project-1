@@ -9,3 +9,4 @@ test-config.json
 docker-compose.yml
 artifacts/
 data_science/__pycache__/
+bench.log

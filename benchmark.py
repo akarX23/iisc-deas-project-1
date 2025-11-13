@@ -7,7 +7,7 @@ from datetime import datetime
 API_URL = "http://localhost:8001"
 
 
-def check_api_health(max_retries=60, retry_delay=2):
+def check_api_health(max_retries=100, retry_delay=5):
     """Check if the API is running with retries."""
     for i in range(max_retries):
         try:
@@ -46,7 +46,7 @@ def run_benchmark(num_workers, mem_per_worker, cores_per_worker, dataset_scale, 
                 "remark": remark,
                 "benchmark_name": benchmark_name
             },
-            timeout=1200
+            timeout=1500
         )
         
         if response.status_code == 200:

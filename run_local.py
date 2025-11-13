@@ -5,7 +5,7 @@ from pyspark import SparkContext
 from nltk.corpus import stopwords
 
 os.environ["SPARK_MASTER_HOST"] = "local[*]"
-os.environ["DATASET_PATH"] = "./data/train.csv"
+os.environ["DATASET_PATH"] = "./data/combined_final.csv"
 os.environ["DRIVER_MEMORY"] = "4g"
 
 from data_science.main import run_data_cleaning
@@ -47,6 +47,13 @@ def run_local_benchmark(dataset_scale=0.1):
     print(f"Throughput: {num_rows / elapsed_time:.2f} rows/sec")
     
     stagemetrics.print_report()
+    
+    df_metrics = stagemetrics.create_stagemetrics_DF()
+    
+    # Convert DataFrame to list of dictionaries
+    stage_metrics_list = df_metrics.orderBy("jobId", "stageId").collect()
+    
+    print(stage_metrics_list)
     
     print(f"\n{'='*60}")
     print(f"Spark UI available at: {spark.sparkContext.uiWebUrl}")

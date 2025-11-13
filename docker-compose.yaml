@@ -48,7 +48,7 @@ services:
       SPARK_MODE: worker
       SPARK_MASTER_URL: spark://spark-master:7077
       SPARK_WORKER_MEMORY: 120G
-      SPARK_WORKER_CORES: '2'
+      SPARK_WORKER_CORES: '3'
       SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
       SPARK_RPC_ENCRYPTION_ENABLED: 'no'
       SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
@@ -74,7 +74,7 @@ services:
       - import requests; requests.get('http://localhost:8081').raise_for_status()
       interval: 10s
       timeout: 5s
-      retries: 15
+      retries: 100
       start_period: 30s
     networks:
     - spark-network
