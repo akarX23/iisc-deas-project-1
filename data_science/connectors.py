@@ -4,6 +4,7 @@ from data_science.config import (
     HTTP_PROXY_HOST, HTTP_PROXY_PORT,
     HTTPS_PROXY_HOST, HTTPS_PROXY_PORT
 )
+import math
 
 spark: SparkSession = None
 
@@ -42,12 +43,25 @@ def getNewSparkSession(num_workers: int = 1, mem_per_worker: int = 10, cores_per
     
     extra_java_options = " ".join(java_options)
 
+    # Calculate memory allocation: 60% for executor heap, 40% for off-heap
+    executor_memory = math.floor(mem_per_worker * 0.6)
+    offheap_memory = mem_per_worker - executor_memory
+
     if not master_url.startswith("local[*]"):
         builder = builder \
             .config("spark.executor.cores", str(cores_per_worker)) \
-            .config("spark.executor.memory", f"{mem_per_worker}g") \
+            .config("spark.executor.memory", f"{executor_memory}g") \
             .config("spark.executor.instances", str(num_workers)) \
-            .config("spark.cores.max", str(num_workers * cores_per_worker))
+            .config("spark.cores.max", str(num_workers * cores_per_worker)) \
+            .config("spark.executor.extraJavaOptions", "-XX:+UseG1GC -XX:InitiatingHeapOccupancyPercent=35") \
+            .config("spark.memory.offHeap.enabled", "true") \
+            .config("spark.memory.offHeap.size", f"{offheap_memory}g") \
+            .config("spark.memory.fraction", "0.8") \
+            .config("spark.sql.adaptive.enabled", "true") \
+            .config("spark.sql.shuffle.partitions", f"{int(num_workers * cores_per_worker * 1.5)}") \
+            .config("spark.sql.autoBroadcastJoinThreshold", "50m") \
+            .config("spark.speculation", "true")
+    
     else:
         builder = builder.config("spark.executor.memory", f"{mem_per_worker}g")
     

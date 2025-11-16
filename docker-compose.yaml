@@ -42,17 +42,73 @@ services:
         condition: service_healthy
       spark-worker-4:
         condition: service_healthy
+      spark-worker-5:
+        condition: service_healthy
+      spark-worker-6:
+        condition: service_healthy
+      spark-worker-7:
+        condition: service_healthy
+      spark-worker-8:
+        condition: service_healthy
+      spark-worker-9:
+        condition: service_healthy
+      spark-worker-10:
+        condition: service_healthy
+      spark-worker-11:
+        condition: service_healthy
+      spark-worker-12:
+        condition: service_healthy
+      spark-worker-13:
+        condition: service_healthy
+      spark-worker-14:
+        condition: service_healthy
+      spark-worker-15:
+        condition: service_healthy
+      spark-worker-16:
+        condition: service_healthy
+      spark-worker-17:
+        condition: service_healthy
+      spark-worker-18:
+        condition: service_healthy
+      spark-worker-19:
+        condition: service_healthy
+      spark-worker-20:
+        condition: service_healthy
+      spark-worker-21:
+        condition: service_healthy
+      spark-worker-22:
+        condition: service_healthy
+      spark-worker-23:
+        condition: service_healthy
+      spark-worker-24:
+        condition: service_healthy
+      spark-worker-25:
+        condition: service_healthy
+      spark-worker-26:
+        condition: service_healthy
+      spark-worker-27:
+        condition: service_healthy
+      spark-worker-28:
+        condition: service_healthy
+      spark-worker-29:
+        condition: service_healthy
+      spark-worker-30:
+        condition: service_healthy
+      spark-worker-31:
+        condition: service_healthy
+      spark-worker-32:
+        condition: service_healthy
     networks:
     - spark-network
   spark-worker-1:
     image: docker.io/bitnamilegacy/spark:latest
     container_name: spark-worker-1
-    cpuset: 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
+    cpuset: 0,1,2,3
     environment:
       SPARK_MODE: worker
       SPARK_MASTER_URL: spark://spark-master:7077
-      SPARK_WORKER_MEMORY: 30G
-      SPARK_WORKER_CORES: '32'
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
       SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
       SPARK_RPC_ENCRYPTION_ENABLED: 'no'
       SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
@@ -82,12 +138,12 @@ services:
   spark-worker-2:
     image: docker.io/bitnamilegacy/spark:latest
     container_name: spark-worker-2
-    cpuset: 32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63
+    cpuset: 4,5,6,7
     environment:
       SPARK_MODE: worker
       SPARK_MASTER_URL: spark://spark-master:7077
-      SPARK_WORKER_MEMORY: 30G
-      SPARK_WORKER_CORES: '32'
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
       SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
       SPARK_RPC_ENCRYPTION_ENABLED: 'no'
       SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
@@ -117,12 +173,12 @@ services:
   spark-worker-3:
     image: docker.io/bitnamilegacy/spark:latest
     container_name: spark-worker-3
-    cpuset: 64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95
+    cpuset: 8,9,10,11
     environment:
       SPARK_MODE: worker
       SPARK_MASTER_URL: spark://spark-master:7077
-      SPARK_WORKER_MEMORY: 30G
-      SPARK_WORKER_CORES: '32'
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
       SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
       SPARK_RPC_ENCRYPTION_ENABLED: 'no'
       SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
@@ -152,12 +208,12 @@ services:
   spark-worker-4:
     image: docker.io/bitnamilegacy/spark:latest
     container_name: spark-worker-4
-    cpuset: 96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127
+    cpuset: 12,13,14,15
     environment:
       SPARK_MODE: worker
       SPARK_MASTER_URL: spark://spark-master:7077
-      SPARK_WORKER_MEMORY: 30G
-      SPARK_WORKER_CORES: '32'
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
       SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
       SPARK_RPC_ENCRYPTION_ENABLED: 'no'
       SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
@@ -167,6 +223,986 @@ services:
       HOME: /opt/bitnami/spark
     ports:
     - 8084:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-5:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-5
+    cpuset: 16,17,18,19
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8085:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-6:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-6
+    cpuset: 20,21,22,23
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8086:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-7:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-7
+    cpuset: 24,25,26,27
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8087:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-8:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-8
+    cpuset: 28,29,30,31
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8088:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-9:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-9
+    cpuset: 32,33,34,35
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8089:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-10:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-10
+    cpuset: 36,37,38,39
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8090:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-11:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-11
+    cpuset: 40,41,42,43
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8091:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-12:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-12
+    cpuset: 44,45,46,47
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8092:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-13:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-13
+    cpuset: 48,49,50,51
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8093:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-14:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-14
+    cpuset: 52,53,54,55
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8094:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-15:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-15
+    cpuset: 56,57,58,59
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8095:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-16:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-16
+    cpuset: 60,61,62,63
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8096:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-17:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-17
+    cpuset: 64,65,66,67
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8097:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-18:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-18
+    cpuset: 68,69,70,71
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8098:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-19:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-19
+    cpuset: 72,73,74,75
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8099:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-20:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-20
+    cpuset: 76,77,78,79
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8100:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-21:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-21
+    cpuset: 80,81,82,83
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8101:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-22:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-22
+    cpuset: 84,85,86,87
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8102:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-23:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-23
+    cpuset: 88,89,90,91
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8103:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-24:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-24
+    cpuset: 92,93,94,95
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8104:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-25:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-25
+    cpuset: 96,97,98,99
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8105:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-26:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-26
+    cpuset: 100,101,102,103
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8106:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-27:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-27
+    cpuset: 104,105,106,107
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8107:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-28:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-28
+    cpuset: 108,109,110,111
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8108:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-29:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-29
+    cpuset: 112,113,114,115
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8109:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-30:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-30
+    cpuset: 116,117,118,119
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8110:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-31:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-31
+    cpuset: 120,121,122,123
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8111:8081
+    volumes:
+    - ./data:/app/data
+    - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh
+    depends_on:
+    - spark-master
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import requests; requests.get('http://localhost:8081').raise_for_status()
+      interval: 10s
+      timeout: 5s
+      retries: 100
+      start_period: 30s
+    networks:
+    - spark-network
+  spark-worker-32:
+    image: docker.io/bitnamilegacy/spark:latest
+    container_name: spark-worker-32
+    cpuset: 124,125,126,127
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 12G
+      SPARK_WORKER_CORES: '4'
+      SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+      SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+      SPARK_SSL_ENABLED: 'no'
+      SPARK_USER: spark
+      SPARK_DAEMON_MEMORY: 1g
+      HOME: /opt/bitnami/spark
+    ports:
+    - 8112:8081
     volumes:
     - ./data:/app/data
     - ./worker-init.sh:/docker-entrypoint-initdb.d/worker-init.sh

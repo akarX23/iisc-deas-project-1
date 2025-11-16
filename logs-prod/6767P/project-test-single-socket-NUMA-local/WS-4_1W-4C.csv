@@ -1,0 +1,2 @@
+num_workers,mem_per_worker,cores_per_worker,dataset_scale,num_rows,num_stages,num_tasks,remark,stage0_time,stage0_throughput,stage0_executorRunTime,stage0_executorCpuTime,stage0_jvmGCTime,stage0_recordsRead,stage0_bytesRead,E2E_time,E2E_throughput
+1,120,4,0.083,65819,1,1,"Weak scaling - 1 worker, 4 cores, 8.3% dataset (single NUMA)",32.654,2015.6489250934032,31824,20637,178,65819,63569920,42.128334283828735,1562.3451797681234
